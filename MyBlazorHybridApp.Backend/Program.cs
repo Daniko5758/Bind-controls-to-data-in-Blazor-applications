@@ -2,6 +2,22 @@ using MyBlazorHybridApp.Backend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Definisikan nama policy CORS
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+// --- 1. TAMBAHKAN SERVICE CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          // Izinkan permintaan dari alamat frontend Web Anda
+                          // PASTIKAN NOMOR PORT INI (7206) SESUAI DENGAN PORT FRONTEND ANDA
+                          policy.WithOrigins("https://localhost:7206")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -38,6 +54,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// --- 2. GUNAKAN MIDDLEWARE CORS ---
+// PENTING: Letakkan UseCors di sini. Setelah UseHttpsRedirection, sebelum UseAuthorization.
+app.UseCors(MyAllowSpecificOrigins);
+
+
 
 app.UseAuthorization();
 
