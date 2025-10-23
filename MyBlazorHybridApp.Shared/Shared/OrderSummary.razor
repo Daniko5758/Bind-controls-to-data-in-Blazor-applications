@@ -1,0 +1,43 @@
+@using BlazingPizza
+@using MyBlazorHybridApp.Shared.Services
+@inject OrderState OrderState
+
+<div>
+    <h2>Your Order</h2>
+
+    @if (OrderState.Order?.Pizzas == null || !OrderState.Order.Pizzas.Any())
+    {
+        <div class="empty-cart">Choose a pizza to get started</div>
+    }
+    else
+    {
+        @foreach (var p in OrderState.Order.Pizzas)
+        {
+            <div class="cart-item configured-pizza-item">
+                <div style="flex:1">
+                    <div class="title">@($"{p.Size}\" {p.Special?.Name}")</div>
+                    <div class="item-price">@p.GetFormattedTotalPrice()</div>
+                </div>
+                <a class="delete-item" href="#" @onclick="() => Remove(p)">×</a>
+            </div>
+        }
+
+        <div style="height:1rem"></div>
+
+        <div class="order-total">
+            <div>Total:</div>
+            <div class="total-price" style="margin-left:auto">@GetFormattedTotal()</div>
+            <button class="checkout-button btn btn-warning" style="margin-left:1rem">Order &gt;</button>
+        </div>
+    }
+</div>
+
+@code {
+    void Remove(Pizza p) => OrderState.RemoveConfiguredPizza(p);
+
+    string GetFormattedTotal()
+    {
+        var total = OrderState.Order?.Pizzas?.Sum(x => x.GetTotalPrice()) ?? 0m;
+        return total.ToString("0.00");
+    }
+}
